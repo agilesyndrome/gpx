@@ -28,4 +28,11 @@ gdal-fetch:
 	tar -xzvf gdal-$(GDAL_VERSION).tar.gz
 
 gdal-build:
-	(mkdir -p ./gdal-$(GDAL_VERSION)/build; cd gdal-$(GDAL_VERSION)/build && cmake .. && cmake --build . && cmake --build . --target install)
+	(cd gdal-$(GDAL_VERSION); ./configure; make; sudo make install)
+
+expat-fetch:
+	git clone https://github.com/libexpat/libexpat
+	
+expat-build:
+	mkdir -p libexpat/expat/build
+	(cd libexpat/expat/build; cmake .. && cmake --build . && cmake --build . --target install)
