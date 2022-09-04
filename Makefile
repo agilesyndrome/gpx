@@ -28,7 +28,9 @@ gdal-fetch:
 	tar -xzvf gdal-$(GDAL_VERSION).tar.gz
 
 gdal-build:
-	(cd gdal-$(GDAL_VERSION); ./configure; make; sudo make install)
+	(cd gdal-$(GDAL_VERSION); \
+           ./configure --with-pg=/Applications/Postgres.app/Contents/Versions/14/bin/pg_config; \
+            make; sudo make install)
 
 expat-fetch:
 	git clone https://github.com/libexpat/libexpat
