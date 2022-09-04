@@ -1,6 +1,8 @@
+.idea/
 *.gz
 gdal-*
 proj-*
 tiff-*
+postgresql-*
 libexpat
 
