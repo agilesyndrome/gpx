@@ -3,6 +3,7 @@
 gdal-*
 proj-*
 tiff-*
+openssl-*
 postgresql-*
 libexpat
 

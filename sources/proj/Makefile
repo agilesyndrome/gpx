@@ -10,7 +10,7 @@ fetch:
 	rm proj-$(PROJ_VERSION).tar.gz
 
 
-proj-$(PROJ_VERSION_VERSION):
+proj-$(PROJ_VERSION):
 	mkdir -p proj-$(PROJ_VERSION)/build
 	(cd proj-$(PROJ_VERSION)/build; \
       cmake .. && \
