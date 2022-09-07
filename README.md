@@ -25,12 +25,31 @@ Download and install the [MacOS Postgres app](https://postgresapp.com/downloads.
 * `brew install cmake` : Build requirement
 * `brew install sqlite3` : Don't try installing multiple versions of Sqlite3 on your Macbook. Bad things will happen. Very bad things. Let brew handle this for us.
 
+### Dependencies from source
 
+* proj (`make proj`)
+* libtiff (`make libtiff`)
+* expat (`make expat`)
+* openssl (`make openssl`)
 
-## Getting Started
-You need some dependencies like libtiff, proj, and gdal.
-
-Try the easy way:
+Install all dependenices, and build gdal:
+```aidl
+make
 ```
-sudo make
+
+
+
+### Building
+
+The simplest way (which will prompt for your password during the install step)
+```aidl
+make
+```
+
+You can override the version installed by default with
+```
+make \
+  LIBTIFF_VERSION=4.0.9 \
+  OPENSSL_VERSION=3.0.5 \
+  build
 ```

@@ -1,12 +1,12 @@
 LIBTIFF_VERSION:=4.0.9
 PROJ_VERSION:=9.1.0
-#EXPAT_VERSION comes from git
+#EXPAT_VERSION sources from git
 OPENSSL_VERSION:=3.0.5
 GDAL_VERSION:=3.5.1
 
 POSTGRES_VERSION:=14.5
 
-build: libtiff proj expat openssl gdal
+build: proj libtiff expat openssl gdal
 
 libtiff:
 	make -C sources/libtiff

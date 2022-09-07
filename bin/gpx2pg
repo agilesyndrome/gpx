@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ -z "${PGDATABASE}" ]; then
+	echo "You must set PGDATABASE env var"
+	exit 0
+fi
+
+if [ -z "${1}" ]; then
+  for f in ${GPX_ROOT}/*.gpx
+  do
+    echo "Testing ${f}"
+    ${0} ${f}
+  done
+  exit 0
+fi
+
+ACTIVITY_NAME=$(basename ${1} | sed 's:.gpx::g')
+
+TABLE_COUNT=$(psql -tc "SELECT count(table_name) FROM information_schema.tables WHERE table_name = '${ACTIVITY_NAME}';" | head -n 1 | tr -s " ")
+
+if [ ${TABLE_COUNT} -ge 1 ]; then
+  echo "Table ${ACTIVITY_NAME} already exists!"
+  exit 1
+fi
+
+# Check XML for validity
+xmlwf ${1}
+
+#ogr2ogr "PG:dbname=${PGDATABASE}" \
+#	-F "PostgreSQL" ${1} \
+#	-nlt MULTILINESTRING \
+#	-nln tracks tracks
+
+ogr2ogr "PG:dbname=${PGDATABASE}" \
+	-F "PostgreSQL" ${1} \
+	-nln ${ACTIVITY_NAME} track_points
