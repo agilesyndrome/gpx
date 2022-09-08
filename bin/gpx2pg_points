@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ -z "${PGDATABASE}" ]; then
+	echo "You must set PGDATABASE env var"
+	exit 0
+fi
+
+if [ -z "${1}" ]; then
+  for f in ${GPX_ROOT}/*.gpx
+  do
+    ${0} ${f}
+  done
+  exit 0
+fi
+
+ACTIVITY_NAME=$(basename ${1} | sed 's:.gpx::g')
+
+TABLE_COUNT=$(psql -tc "SELECT count(table_name) FROM information_schema.tables WHERE table_name = '${ACTIVITY_NAME}';" | head -n 1 | tr -s " ")
+
+if [ ${TABLE_COUNT} -ge 1 ]; then
+  echo "${ACTIVITY_NAME} already exists"
+  exit 0
+fi
+
+# Check XML for validity
+xmlwf ${1}
+
+if [ "${GPX_DRYRUN}" != "1" ]; then
+
+  ogr2ogr "PG:dbname=${PGDATABASE}" \
+	  -F "PostgreSQL" ${1} \
+	  -nln ${ACTIVITY_NAME} track_points
+
+  echo "${ACTIVITY_NAME} imported"
+  aws s3 mv ${1} ${GPX_S3}
+else
+  echo "${ACTIVITY_NAME} would be imported"
+fi

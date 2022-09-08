@@ -8,29 +8,42 @@ fi
 if [ -z "${1}" ]; then
   for f in ${GPX_ROOT}/*.gpx
   do
-    echo "Testing ${f}"
     ${0} ${f}
   done
   exit 0
 fi
 
 ACTIVITY_NAME=$(basename ${1} | sed 's:.gpx::g')
+START_TIME=$(cat ${1} | grep -i time | tr -d " " | head -n 1 | sed 's:</*time>::g')
+END_TIME=$(cat ${1} | grep -i time  | tr -d " " | tail -n 1 | sed 's:</*time>::g')
+USER_ID=$(whoami)
+POINTS=$(cat ${1} | grep -i "trkpt lat" | wc -l | tr -d " ")
+ORIG_NAME=$(cat ${1} | grep -i "<name>" | sed 's:</*name>::g')
 
-TABLE_COUNT=$(psql -tc "SELECT count(table_name) FROM information_schema.tables WHERE table_name = '${ACTIVITY_NAME}';" | head -n 1 | tr -s " ")
 
-if [ ${TABLE_COUNT} -ge 1 ]; then
-  echo "Table ${ACTIVITY_NAME} already exists!"
-  exit 1
-fi
+# Replace <name> to the file name...
+gsed -i.orig -e "s^<name>.*</name>^<name>${ACTIVITY_NAME}</name><cmt>${ORIG_NAME}</cmt><src>${USER_ID}</src><number>${POINTS}</number><link1_text>${START_TIME}</link1_text><link2_text>${END_TIME}</link2_text>^" ${1}
+
+
+
+#ACTIVITY_COUNT=$(psql -tc "SELECT count(name) FROM tracks WHERE name = '${ACTIVITY_NAME}';" | head -n 1 | tr -s " ")
+
+#if [ ${ACTIVITY_COUNT} -ge 1 ]; then
+#  echo "${ACTIVITY_NAME} already exists"
+#  exit 0
+#fi
 
 # Check XML for validity
 xmlwf ${1}
 
-#ogr2ogr "PG:dbname=${PGDATABASE}" \
-#	-F "PostgreSQL" ${1} \
-#	-nlt MULTILINESTRING \
-#	-nln tracks tracks
+if [ "${GPX_DRYRUN}" != "1" ]; then
+  echo "Importing ${ACTIVITY_NAME}"
+  ogr2ogr "PG:dbname=${PGDATABASE}" \
+	  -F "PostgreSQL" ${1} \
+	  -nlt MULTILINESTRING \
+	  -nln tracks tracks
 
-ogr2ogr "PG:dbname=${PGDATABASE}" \
-	-F "PostgreSQL" ${1} \
-	-nln ${ACTIVITY_NAME} track_points
+  #aws s3 mv ${1} ${GPX_S3}
+else
+  echo "${ACTIVITY_NAME} would be imported"
+fi
