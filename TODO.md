@@ -4,3 +4,5 @@
 	* or Extents, which seems much faster
 
 
+* Lines to polygons from Geography is close to what I want
+

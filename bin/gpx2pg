@@ -36,6 +36,8 @@ gsed -i.orig -e "s^<name>.*</name>^<name>${ACTIVITY_NAME}</name><cmt>${ORIG_NAME
 # Check XML for validity
 xmlwf ${1}
 
+aws s3 cp ${1} ${GPX_S3}
+
 if [ "${GPX_DRYRUN}" != "1" ]; then
   echo "Importing ${ACTIVITY_NAME}"
   ogr2ogr "PG:dbname=${PGDATABASE}" \
@@ -43,7 +45,6 @@ if [ "${GPX_DRYRUN}" != "1" ]; then
 	  -nlt MULTILINESTRING \
 	  -nln tracks tracks
 
-  #aws s3 mv ${1} ${GPX_S3}
 else
   echo "${ACTIVITY_NAME} would be imported"
 fi
